@@ -8,7 +8,7 @@ class SeederData
 {
     public static function read(): array
     {
-        $path = base_path('.READ/seederStarter.json');
+        $path = base_path('seederStarter.json');
         $json = file_get_contents($path);
 
         if ($json === false) {
