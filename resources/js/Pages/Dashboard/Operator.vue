@@ -93,7 +93,7 @@ const statusTone = (status) => {
         </template>
 
         <div class="space-y-6">
-            <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
+            <section class="grid grid-cols-2 gap-4 xl:grid-cols-5">
                 <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                     <div class="text-xs font-semibold uppercase tracking-wide text-slate-500">Total reported</div>
                     <div class="mt-3 text-3xl font-semibold text-slate-900">{{ stats.total_reported ?? '-' }}</div>

@@ -4,6 +4,14 @@ import vue from "@vitejs/plugin-vue";
 import tailwindcss from "tailwindcss";
 
 export default defineConfig({
+        server: {
+        host: '0.0.0.0',
+        port: 5173,
+        strictPort: true,
+        hmr: {
+            host: '192.168.1.9',
+        }
+    },
     plugins: [
         laravel({
             input: "resources/js/app.js",

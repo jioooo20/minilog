@@ -60,6 +60,7 @@ class IncidentResource extends JsonResource
                 return $this->closer ? ['id' => $this->closer->id, 'name' => $this->closer->name] : null;
             }),
             'created_at' => optional($this->created_at)->toDateTimeString(),
+            'updated_at' => optional($this->updated_at)->toDateTimeString(),
             'detected_at' => optional($this->detected_at)->toDateTimeString(),
             'resolved_at' => optional($this->resolved_at)->toDateTimeString(),
             'closed_at' => optional($this->closed_at)->toDateTimeString(),
