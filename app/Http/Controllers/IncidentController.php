@@ -23,9 +23,21 @@ class IncidentController extends Controller
     {
         return Inertia::render('Incidents/Create', [
             'items' => Item::query()
-                ->select(['item_id', 'item_name'])
+                ->select(['item_id', 'item_name', 'status'])
                 ->orderBy('item_name')
+                ->where('is_active', true)
                 ->get()
+                ->map(static function (Item $item): array {
+                    return [
+                        'item_id' => $item->item_id,
+                        'item_name' => $item->item_name,
+                        'status' => $item->status,
+                        'item_status' => $item->status,
+                    ];
+                })
+                ->toArray(),
+            'item_statuses' => Item::query()
+                ->pluck('status', 'item_id')
                 ->toArray(),
             'locations' => Location::query()
                 ->select(['location_id', 'location_name'])

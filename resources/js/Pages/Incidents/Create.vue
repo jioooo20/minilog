@@ -4,10 +4,14 @@ import ModalConfirm from '@/Components/ModalConfirm.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
-defineProps({
+const props = defineProps({
   items: {
     type: Array,
     default: () => [],
+  },
+  item_statuses: {
+    type: Object,
+    default: () => ({}),
   },
   locations: {
     type: Array,
@@ -40,6 +44,10 @@ const openConfirm = () => {
 const handleConfirm = async () => {
   confirmOpen.value = false;
   submit();
+};
+
+const getItemStatus = (item) => {
+  return props.item_statuses?.[item?.item_id] ?? item?.status ?? item?.item_status ?? '';
 };
 </script>
 
@@ -93,10 +101,17 @@ const handleConfirm = async () => {
             class="w-full rounded-lg border-slate-300 text-sm focus:border-slate-500 focus:ring-slate-500"
           >
             <option value="">Pilih asset</option>
-            <option v-for="item in items" :key="item.item_id" :value="item.item_id">
-              {{ item.item_name }}
+            <option
+              v-for="item in props.items"
+              :key="item.item_id"
+              :value="item.item_id"
+              :disabled="getItemStatus(item) !== 'operational'"
+              :class="getItemStatus(item) !== 'operational' ? 'bg-rose-50 text-rose-700' : ''"
+            >
+              {{ item.item_name }}{{ getItemStatus(item) !== 'operational' ? ` (${getItemStatus(item) || 'unknown'})` : '' }}
             </option>
           </select>
+          <p class="mt-1 text-xs text-slate-500">Asset non-operational ditandai merah dan tidak dapat dipilih.</p>
           <p v-if="form.errors.item_id" class="mt-1 text-xs text-rose-600">{{ form.errors.item_id }}</p>
         </div>
 
@@ -107,14 +122,14 @@ const handleConfirm = async () => {
             class="w-full rounded-lg border-slate-300 text-sm focus:border-slate-500 focus:ring-slate-500"
           >
             <option value="">Pilih lokasi</option>
-            <option v-for="location in locations" :key="location.location_id" :value="location.location_id">
+            <option v-for="location in props.locations" :key="location.location_id" :value="location.location_id">
               {{ location.location_name }}
             </option>
           </select>
           <p v-if="form.errors.location_id" class="mt-1 text-xs text-rose-600">{{ form.errors.location_id }}</p>
         </div>
 
-        <div>
+        <!-- <div>
           <label class="mb-1 block text-sm font-semibold text-slate-700">Component (optional)</label>
           <select
             v-model="form.component_item_id"
@@ -126,7 +141,7 @@ const handleConfirm = async () => {
             </option>
           </select>
           <p v-if="form.errors.component_item_id" class="mt-1 text-xs text-rose-600">{{ form.errors.component_item_id }}</p>
-        </div>
+        </div> -->
 
         <div>
           <label class="mb-1 block text-sm font-semibold text-slate-700">Severity</label>
@@ -141,17 +156,17 @@ const handleConfirm = async () => {
           </select>
           <p v-if="form.errors.severity" class="mt-1 text-xs text-rose-600">{{ form.errors.severity }}</p>
         </div>
+        <div>
+          <label class="mb-1 block text-sm font-semibold text-slate-700">Detected At (optional)</label>
+          <input
+            v-model="form.detected_at"
+            type="datetime-local"
+            class="w-full rounded-lg border-slate-300 text-sm focus:border-slate-500 focus:ring-slate-500"
+          />
+          <p v-if="form.errors.detected_at" class="mt-1 text-xs text-rose-600">{{ form.errors.detected_at }}</p>
+        </div>
       </div>
 
-      <div>
-        <label class="mb-1 block text-sm font-semibold text-slate-700">Detected At (optional)</label>
-        <input
-          v-model="form.detected_at"
-          type="datetime-local"
-          class="w-full rounded-lg border-slate-300 text-sm focus:border-slate-500 focus:ring-slate-500"
-        />
-        <p v-if="form.errors.detected_at" class="mt-1 text-xs text-rose-600">{{ form.errors.detected_at }}</p>
-      </div>
 
       <div class="flex flex-wrap gap-2 pt-2">
         <button

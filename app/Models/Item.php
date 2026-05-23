@@ -29,11 +29,13 @@ class Item extends Model
         'last_calibration_date',
         'calibration_due_date',
         'is_critical',
+        'is_active',
         'created_by',
     ];
 
     protected $casts = [
         'is_critical' => 'boolean',
+        'is_active' => 'boolean',
         'installation_date' => 'date',
         'last_calibration_date' => 'date',
         'calibration_due_date' => 'date',

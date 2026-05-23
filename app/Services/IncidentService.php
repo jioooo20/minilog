@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\AuditLog;
 use App\Models\Incident;
+use App\Models\Item;
 use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -16,6 +17,15 @@ class IncidentService
         return DB::transaction(function () use ($payload, $reporter, $ipAddress): Incident {
             $detectedAt = $payload['detected_at'] ?? now();
             $incidentCode = $payload['incident_code'] ?? $this->generateIncidentCode($detectedAt);
+
+            $item = Item::query()
+                ->whereKey($payload['item_id'])
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ($item->status !== 'operational') {
+                abort(422, 'Selected asset is not operational and cannot be used for new incident reporting.');
+            }
 
             $incident = Incident::create([
                 'incident_code' => $incidentCode,
@@ -30,13 +40,21 @@ class IncidentService
                 'reported_by' => $reporter->id,
             ]);
 
+            $item->update([
+                'status' => 'maintenance',
+            ]);
+
             $this->writeAudit(
                 $incident,
                 $reporter,
                 'create_incident',
                 'Incident created',
                 [],
-                ['status' => 'open', 'severity' => $incident->severity],
+                [
+                    'status' => 'open',
+                    'severity' => $incident->severity,
+                    'item_status' => 'maintenance',
+                ],
                 $ipAddress
             );
 
@@ -419,6 +437,12 @@ class IncidentService
         $this->assertStatus($incident, ['verifying']);
 
         return DB::transaction(function () use ($incident, $supervisor, $closingNotes, $ipAddress): Incident {
+            $item = Item::query()
+                ->whereKey($incident->item_id)
+                ->lockForUpdate()
+                ->first();
+            $hasOtherActiveIncidents = false;
+
             $incident->fill([
                 'status' => 'closed',
                 'closed_by' => $supervisor->id,
@@ -426,13 +450,30 @@ class IncidentService
                 'closing_notes' => $closingNotes,
             ])->save();
 
+            if ($item) {
+                $hasOtherActiveIncidents = Incident::query()
+                    ->where('item_id', $incident->item_id)
+                    ->where('incident_id', '!=', $incident->incident_id)
+                    ->where('status', '!=', 'closed')
+                    ->exists();
+
+                if (!$hasOtherActiveIncidents) {
+                    $item->update([
+                        'status' => 'operational',
+                    ]);
+                }
+            }
+
             $this->writeAudit(
                 $incident,
                 $supervisor,
                 'close_incident',
                 'Incident closed',
                 ['status' => 'verifying'],
-                ['status' => 'closed'],
+                [
+                    'status' => 'closed',
+                    'item_status' => $item && !$hasOtherActiveIncidents ? 'operational' : null,
+                ],
                 $ipAddress
             );
 

@@ -103,6 +103,7 @@ class IncidentWorkflowController extends Controller
             'approver',
             'auditLogs.user',
         ]);
+        // dd($incident->toArray());
 
         return Inertia::render('Incidents/InvestigateReview', [
             'incident' => (new IncidentResource($incident))->response()->getData(true),

@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class IncidentStoreRequest extends FormRequest
 {
@@ -16,7 +17,11 @@ class IncidentStoreRequest extends FormRequest
         return [
             'title' => ['required', 'string', 'max:200'],
             'description' => ['required', 'string'],
-            'item_id' => ['required', 'integer', 'exists:items,item_id'],
+            'item_id' => [
+                'required',
+                'integer',
+                Rule::exists('items', 'item_id')->where(fn ($query) => $query->where('status', 'operational')),
+            ],
             'component_item_id' => ['nullable', 'integer', 'exists:items,item_id'],
             'location_id' => ['required', 'integer', 'exists:locations,location_id'],
             'severity' => ['required', 'in:Low,Medium,High,Critical'],

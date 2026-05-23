@@ -118,13 +118,57 @@ const severityClass = (sev) => {
   return 'rounded-full bg-slate-100 px-2 py-1 text-xs font-semibold uppercase text-slate-700';
 };
 
-const rowSeverityClass = (sev) => {
+const rowSeverityClass = (sev, status) => {
+  if (String(status ?? '').toLowerCase() === 'closed') {
+    return '';
+  }
+
   const s = String(sev ?? '').toLowerCase();
   if (s === 'critical') return 'bg-rose-100';
   if (s === 'high') return 'bg-orange-100';
   if (s === 'medium') return 'bg-yellow-50';
   return '';
 };
+
+const sortedIncidents = computed(() => {
+  const list = Array.isArray(props.incidents?.data) ? [...props.incidents.data] : [];
+
+  const statusRank = (status) => {
+    if (String(status ?? '').toLowerCase() === 'closed') {
+      return 1;
+    }
+
+    return 0;
+  };
+
+  const severityRank = (severity) => {
+    const s = String(severity ?? '').toLowerCase();
+
+    if (s === 'critical') return 0;
+    if (s === 'high') return 1;
+    if (s === 'medium') return 2;
+    if (s === 'low') return 3;
+
+    return 4;
+  };
+
+  return list.sort((left, right) => {
+    const rankDiff = statusRank(left.status) - statusRank(right.status);
+    if (rankDiff !== 0) {
+      return rankDiff;
+    }
+
+    const severityDiff = severityRank(left.severity) - severityRank(right.severity);
+    if (severityDiff !== 0) {
+      return severityDiff;
+    }
+
+    const leftDate = new Date(left.detected_at ?? 0).getTime();
+    const rightDate = new Date(right.detected_at ?? 0).getTime();
+
+    return rightDate - leftDate;
+  });
+});
 
 // per-row investigation CTA uses inline condition in template
 </script>
@@ -247,7 +291,7 @@ const rowSeverityClass = (sev) => {
             <tr v-if="!incidents.data?.length">
               <td colspan="7" class="px-4 py-8 text-center text-slate-500">No incident records yet.</td>
             </tr>
-            <tr v-for="incident in incidents.data" :key="incident.incident_id" :class="rowSeverityClass(incident.severity)">
+            <tr v-for="incident in sortedIncidents" :key="incident.incident_id" :class="rowSeverityClass(incident.severity, incident.status)">
               <td class="px-4 py-3 font-medium text-slate-900">{{ incident.incident_code || '-' }}</td>
               <td class="px-4 py-3">{{ incident.item?.name || '-' }}</td>
                 <td class="px-4 py-3">{{ incident.location?.name || '-' }}</td>

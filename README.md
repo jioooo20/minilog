@@ -18,8 +18,8 @@ MiniLog adalah aplikasi manajemen incident berbasis Laravel 12 dengan Inertia.js
 - Incident management dan workflow incident
 - Master data management
 - Notification center
-- Audit log dan export report
-- File attachment dan document output PDF
+- Audit log
+- Document output PDF
 
 ## Requirement
 
@@ -34,7 +34,7 @@ MiniLog adalah aplikasi manajemen incident berbasis Laravel 12 dengan Inertia.js
 ### 1. Clone repository
 
 ```bash
-git clone <url-repository>
+git clone https://github.com/jioooo20/minilog
 cd minilog
 ```
 
