@@ -378,7 +378,7 @@ class MasterDataController extends Controller
         return [
             'items' => [
                 'label' => 'Items',
-                'description' => 'Kelola aset, komponen, dan item operasional.',
+                'description' => 'Manage assets, components, and operational items.',
                 'model' => Item::class,
                 'order_by' => 'item_name',
                 'active_column' => 'is_active',
@@ -411,7 +411,7 @@ class MasterDataController extends Controller
             ],
             'locations' => [
                 'label' => 'Locations',
-                'description' => 'Kelola lokasi, line, station, dan area kerja.',
+                'description' => 'Manage locations, lines, stations, and work areas.',
                 'model' => Location::class,
                 'order_by' => 'location_name',
                 'active_column' => 'is_active',
@@ -432,7 +432,7 @@ class MasterDataController extends Controller
             ],
             'departments' => [
                 'label' => 'Departments',
-                'description' => 'Kelola departemen dan penanggung jawabnya.',
+                'description' => 'Manage departments and their responsible persons.',
                 'model' => Department::class,
                 'order_by' => 'dept_name',
                 'active_column' => 'is_active',
@@ -453,7 +453,7 @@ class MasterDataController extends Controller
             ],
             'categories' => [
                 'label' => 'Categories',
-                'description' => 'Kelola kategori aset/item.',
+                'description' => 'Manage asset/item categories.',
                 'model' => ItemCategory::class,
                 'order_by' => 'category_name',
                 'active_column' => 'is_active',

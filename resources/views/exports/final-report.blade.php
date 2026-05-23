@@ -251,15 +251,15 @@
 		<table class="header-table">
 			<tr>
 				<td class="brand">
-					<div class="brand-title">LAPORAN FINAL AUDIT INSIDEN</div>
-					<div class="brand-subtitle">Dokumen evaluasi penanganan insiden, tindakan korektif, verifikasi, dan penutupan akhir</div>
+					<div class="brand-title">FINAL INCIDENT AUDIT REPORT</div>
+					<div class="brand-subtitle">Evaluation document for incident handling, corrective actions, verification, and final closure</div>
 					<div class="report-title">{{ $incident['incident_code'] }} - {{ $incident['title'] }}</div>
-					<div class="report-subtitle">Disusun untuk kebutuhan audit internal dan arsip final insiden</div>
+					<div class="report-subtitle">Prepared for internal audit purposes and final incident archiving</div>
 				</td>
 				<td class="docmeta">
-					<div><span class="label">No. Dokumen</span><br><span class="value">{{ $reportNumber }}</span></div>
-					<div style="margin-top: 8px;"><span class="label">Tanggal Cetak</span><br><span class="value">{{ $generatedAt->format('d M Y, H:i') }}</span></div>
-					<div style="margin-top: 8px;"><span class="label">Disiapkan oleh</span><br><span class="value">{{ $preparedBy->name ?? '-' }}</span></div>
+					<div><span class="label">Document No.</span><br><span class="value">{{ $reportNumber }}</span></div>
+					<div style="margin-top: 8px;"><span class="label">Print Date</span><br><span class="value">{{ $generatedAt->format('d M Y, H:i') }}</span></div>
+					<div style="margin-top: 8px;"><span class="label">Prepared By</span><br><span class="value">{{ $preparedBy->name ?? '-' }}</span></div>
 				</td>
 			</tr>
 		</table>
@@ -276,11 +276,11 @@
 	</div>
 
 	<div class="section">
-		<div class="section-title">1. Identitas Insiden</div>
+		<div class="section-title">1. Incident Identity</div>
 		<div class="section-body">
 			<table class="info-table">
 				<tr>
-					<th>Judul Insiden</th>
+					<th>Incident Title</th>
 					<td>{{ $incident['title'] ?? '-' }}</td>
 				</tr>
 				<tr>
@@ -288,19 +288,19 @@
 					<td>{{ $incident['item']['name'] ?? '-' }}</td>
 				</tr>
 				<tr>
-					<th>Komponen Terkait</th>
+					<th>Related Component</th>
 					<td>{{ $incident['component_item']['name'] ?? '-' }}</td>
 				</tr>
 				<tr>
-					<th>Lokasi</th>
+					<th>Location</th>
 					<td>{{ $incident['location']['name'] ?? '-' }}</td>
 				</tr>
 				<tr>
-					<th>Pelapor</th>
+					<th>Reporter</th>
 					<td>{{ $incident['reported_by']['name'] ?? '-' }}</td>
 				</tr>
 				<tr>
-					<th>Penanggung Jawab</th>
+					<th>Responsible Person</th>
 					<td>{{ $incident['assigned_to']['name'] ?? '-' }}</td>
 				</tr>
 			</table>
@@ -311,7 +311,7 @@
 		<tr>
 			<td>
 				<div class="section">
-					<div class="section-title">2. Kronologi Utama</div>
+					<div class="section-title">2. Main Timeline</div>
 					<div class="section-body">
 						<table class="info-table">
 							<tr><th>Detected At</th><td>{{ $incident['detected_at'] ?? '-' }}</td></tr>
@@ -327,7 +327,7 @@
 			</td>
 			<td>
 				<div class="section">
-					<div class="section-title">3. Ringkasan Durasi Fase</div>
+					<div class="section-title">3. Phase Duration Summary</div>
 					<div class="section-body">
 						<table class="info-table">
 							@forelse ($phases as $label => $duration)
@@ -337,7 +337,7 @@
 								</tr>
 							@empty
 								<tr>
-									<td colspan="2" class="muted">Belum ada perhitungan durasi fase yang tersedia.</td>
+									<td colspan="2" class="muted">No phase duration calculations are available yet.</td>
 								</tr>
 							@endforelse
 						</table>
@@ -348,23 +348,23 @@
 	</table>
 
 	<div class="section">
-		<div class="section-title">4. Ringkasan Eksekutif</div>
+		<div class="section-title">4. Executive Summary</div>
 		<div class="section-body">
 			<table class="info-table">
 				<tr>
-					<th>Deskripsi Awal</th>
+					<th>Initial Description</th>
 					<td class="narrative">{{ $incident['description'] ?? '-' }}</td>
 				</tr>
 				<tr>
-					<th>Hipotesis Investigasi</th>
+					<th>Investigation Hypothesis</th>
 					<td class="narrative">{{ $incident['root_cause_hypothesis'] ?? '-' }}</td>
 				</tr>
 				<tr>
-					<th>Catatan Investigasi</th>
+					<th>Investigation Notes</th>
 					<td class="narrative">{{ $incident['investigation_notes'] ?? '-' }}</td>
 				</tr>
 				<tr>
-					<th>Catatan Review Supervisor</th>
+					<th>Supervisor Review Notes</th>
 					<td class="narrative">{{ $incident['hypothesis_review_notes'] ?? '-' }}</td>
 				</tr>
 			</table>
@@ -372,31 +372,31 @@
 	</div>
 
 	<div class="section">
-		<div class="section-title">5. Tindakan Korektif dan Verifikasi</div>
+		<div class="section-title">5. Corrective Actions and Verification</div>
 		<div class="section-body">
 			<table class="info-table">
 				<tr>
-					<th>Hipotesis Disetujui</th>
-					<td>{{ $incident['hypothesis_approved'] ? 'Ya' : 'Tidak' }}</td>
+					<th>Hypothesis Approved</th>
+					<td>{{ $incident['hypothesis_approved'] ? 'Yes' : 'No' }}</td>
 				</tr>
 				<tr>
-					<th>Tindakan Perbaikan</th>
+					<th>Corrective Actions</th>
 					<td class="narrative">{{ $incident['corrective_actions'] ?? '-' }}</td>
 				</tr>
 				<tr>
-					<th>Parts / Komponen Diganti</th>
+					<th>Replaced Parts / Components</th>
 					<td class="narrative">{{ $incident['parts_replaced'] ?? '-' }}</td>
 				</tr>
 				<tr>
-					<th>Catatan Verifikasi</th>
+					<th>Verification Notes</th>
 					<td class="narrative">{{ $incident['verification_notes'] ?? '-' }}</td>
 				</tr>
 				<tr>
 					<th>Closing Requested</th>
-					<td>{{ $incident['closing_requested'] ? 'Ya' : 'Tidak' }}</td>
+					<td>{{ $incident['closing_requested'] ? 'Yes' : 'No' }}</td>
 				</tr>
 				<tr>
-					<th>Catatan Penutupan</th>
+					<th>Closing Notes</th>
 					<td class="narrative">{{ $incident['closing_notes'] ?? '-' }}</td>
 				</tr>
 			</table>
@@ -404,15 +404,15 @@
 	</div>
 
 	<div class="section">
-		<div class="section-title">6. Audit Trail Aktivitas</div>
+		<div class="section-title">6. Activity Audit Trail</div>
 		<div class="section-body">
 			<table class="timeline">
 				<thead>
 					<tr>
-						<th style="width: 16%">Waktu</th>
-						<th style="width: 16%">Aktivitas</th>
-						<th style="width: 16%">Pelaksana</th>
-						<th style="width: 36%">Detail</th>
+						<th style="width: 16%">Time</th>
+						<th style="width: 16%">Activity</th>
+						<th style="width: 16%">Actor</th>
+						<th style="width: 36%">Details</th>
 						<th style="width: 16%">IP</th>
 					</tr>
 				</thead>
@@ -429,7 +429,7 @@
 								{{ $entry['details'] ?? '-' }}
 								@if(!empty($entry['old_value']) || !empty($entry['new_value']))
 									<div class="small" style="margin-top: 4px;">
-										Ada perubahan data pada log ini.
+										This log contains data changes.
 									</div>
 								@endif
 							</td>
@@ -437,7 +437,7 @@
 						</tr>
 					@empty
 						<tr>
-							<td colspan="5" class="muted">Tidak ada audit trail yang tersedia.</td>
+							<td colspan="5" class="muted">No audit trail is available.</td>
 						</tr>
 					@endforelse
 				</tbody>
@@ -446,7 +446,7 @@
 	</div>
 
 	<div class="section">
-		<div class="section-title">7. Disposisi Akhir</div>
+		<div class="section-title">7. Final Disposition</div>
 		<div class="section-body">
 			<table class="info-table">
 				<tr>
@@ -458,7 +458,7 @@
 					<td>{{ $incident['verified_by']['name'] ?? '-' }}</td>
 				</tr>
 				<tr>
-					<th>Penutup Insiden</th>
+					<th>Incident Closer</th>
 					<td>{{ $incident['closed_by']['name'] ?? '-' }}</td>
 				</tr>
 			</table>
@@ -468,7 +468,7 @@
 	
 
 	<div class="footer">
-		<span>Dokumen internal - {{ $incident['incident_code'] }}</span>
+		<span>Internal document - {{ $incident['incident_code'] }}</span>
 		<span class="page-note">Generated on {{ $generatedAt->format('d M Y, H:i') }}</span>
 	</div>
 </body>

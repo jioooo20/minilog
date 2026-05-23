@@ -83,6 +83,7 @@ const severityTone = (severity) => {
 </script>
 
 <template>
+
   <Head title="Engineer Dashboard" />
 
   <AuthenticatedLayout>
@@ -138,10 +139,12 @@ const severityTone = (severity) => {
           </div>
 
           <div class="flex flex-wrap gap-2">
-            <button type="button" @click="resetFilters" class="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+            <button type="button" @click="resetFilters"
+              class="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
               Reset
             </button>
-            <button type="button" @click="fetchData" class="rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700">
+            <button type="button" @click="fetchData"
+              class="rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700">
               Refresh
             </button>
           </div>
@@ -150,7 +153,8 @@ const severityTone = (severity) => {
         <div class="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3">
           <div>
             <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">Status</label>
-            <select v-model="filters.status" class="w-full rounded-xl border-slate-300 text-sm focus:border-slate-500 focus:ring-slate-500">
+            <select v-model="filters.status"
+              class="w-full rounded-xl border-slate-300 text-sm focus:border-slate-500 focus:ring-slate-500">
               <option value="">Any</option>
               <option value="investigating">Investigating</option>
               <option value="repairing">Repairing</option>
@@ -160,7 +164,8 @@ const severityTone = (severity) => {
 
           <div>
             <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">Severity</label>
-            <select v-model="filters.severity" class="w-full rounded-xl border-slate-300 text-sm focus:border-slate-500 focus:ring-slate-500">
+            <select v-model="filters.severity"
+              class="w-full rounded-xl border-slate-300 text-sm focus:border-slate-500 focus:ring-slate-500">
               <option value="">Any</option>
               <option value="low">Low</option>
               <option value="medium">Medium</option>
@@ -171,7 +176,8 @@ const severityTone = (severity) => {
 
           <div>
             <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">Search</label>
-            <input v-model="filters.search" type="text" placeholder="Search code, title, asset, location" class="w-full rounded-xl border-slate-300 text-sm focus:border-slate-500 focus:ring-slate-500" />
+            <input v-model="filters.search" type="text" placeholder="Search code, title, asset, location"
+              class="w-full rounded-xl border-slate-300 text-sm focus:border-slate-500 focus:ring-slate-500" />
           </div>
         </div>
       </section>
@@ -188,7 +194,8 @@ const severityTone = (severity) => {
         </div>
 
         <div class="mt-4 space-y-3">
-          <div v-if="loading" class="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 py-6 text-sm text-slate-500">
+          <div v-if="loading"
+            class="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 py-6 text-sm text-slate-500">
             Loading...
           </div>
 
@@ -196,7 +203,8 @@ const severityTone = (severity) => {
             Failed to load data.
           </div>
 
-          <article v-for="inc in filteredRecent" :key="inc.incident_id" class="overflow-hidden rounded-2xl border border-slate-200 bg-slate-50/60 shadow-sm">
+          <article v-for="inc in filteredRecent" :key="inc.incident_id"
+            class="overflow-hidden rounded-2xl border border-slate-200 bg-slate-50/60 shadow-sm">
             <div class="flex flex-col gap-4 p-4 lg:flex-row lg:items-start lg:justify-between">
               <div class="min-w-0 flex-1">
                 <div class="flex flex-wrap items-center gap-2">
@@ -220,39 +228,29 @@ const severityTone = (severity) => {
               </div>
 
               <div class="flex shrink-0 flex-wrap gap-2">
-                <a
-                  v-if="inc.status === 'investigating'"
-                  :href="route('incidents.investigate', inc.incident_id)"
-                  class="rounded-xl bg-amber-500 px-4 py-2 text-sm font-medium text-white hover:bg-amber-600"
-                >
+                <a v-if="inc.status === 'investigating'" :href="route('incidents.investigate', inc.incident_id)"
+                  class="rounded-xl bg-amber-500 px-4 py-2 text-sm font-medium text-white hover:bg-amber-600">
                   Investigate
                 </a>
-                <a
-                  v-else-if="inc.status === 'repairing'"
-                  :href="route('incidents.repair', inc.incident_id)"
-                  class="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
-                >
+                <a v-else-if="inc.status === 'repairing'" :href="route('incidents.repair', inc.incident_id)"
+                  class="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700">
                   Repair
                 </a>
-                <a
-                  v-else-if="inc.status === 'verifying'"
-                  :href="route('incidents.verify-form', inc.incident_id)"
-                  class="rounded-xl bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-700"
-                >
+                <a v-else-if="inc.status === 'verifying'" :href="route('incidents.verify-form', inc.incident_id)"
+                  class="rounded-xl bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-700">
                   Verify
                 </a>
 
-                <a
-                  :href="route('incidents.show', inc.incident_id)"
-                  class="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
-                >
+                <a :href="route('incidents.show', inc.incident_id)"
+                  class="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
                   Detail
                 </a>
               </div>
             </div>
           </article>
 
-          <div v-if="!loading && filteredRecent.length === 0" class="rounded-xl border border-dashed border-slate-200 px-4 py-8 text-center text-sm text-slate-500">
+          <div v-if="!loading && filteredRecent.length === 0"
+            class="rounded-xl border border-dashed border-slate-200 px-4 py-8 text-center text-sm text-slate-500">
             No matching assigned incidents.
           </div>
         </div>
@@ -260,4 +258,3 @@ const severityTone = (severity) => {
     </div>
   </AuthenticatedLayout>
 </template>
-
