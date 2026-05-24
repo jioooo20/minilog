@@ -23,8 +23,9 @@ class IncidentController extends Controller
     {
         return Inertia::render('Incidents/Create', [
             'items' => Item::query()
-                ->select(['item_id', 'item_name', 'status'])
-                ->orderBy('item_name')
+                ->with(['location:location_id,location_name'])
+                ->select(['item_id', 'item_name', 'status', 'location_id'])
+                ->orderBy('item_name', 'asc')
                 ->where('is_active', true)
                 ->get()
                 ->map(static function (Item $item): array {
@@ -33,6 +34,8 @@ class IncidentController extends Controller
                         'item_name' => $item->item_name,
                         'status' => $item->status,
                         'item_status' => $item->status,
+                        'location_id' => $item->location_id,
+                        'location_name' => $item->location?->location_name,
                     ];
                 })
                 ->toArray(),
@@ -42,7 +45,7 @@ class IncidentController extends Controller
             'locations' => Location::query()
                 ->select(['location_id', 'location_name'])
                 ->where('is_active', true)
-                ->orderBy('location_name')
+                ->orderBy('location_name', 'asc')
                 ->get()
                 ->toArray(),
         ]);
@@ -111,7 +114,7 @@ class IncidentController extends Controller
             ],
             'items' => Item::query()
                 ->select(['item_id', 'item_name'])
-                ->orderBy('item_name')
+                ->orderBy('item_name', 'asc')
                 ->get()
                 ->toArray(),
         ]);

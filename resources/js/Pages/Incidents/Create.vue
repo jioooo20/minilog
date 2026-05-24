@@ -49,6 +49,14 @@ const handleConfirm = async () => {
 const getItemStatus = (item) => {
   return props.item_statuses?.[item?.item_id] ?? item?.status ?? item?.item_status ?? '';
 };
+
+const getItemLabel = (item) => {
+  const status = getItemStatus(item);
+  const locationName = item?.location_name;
+  const locationSuffix = item?.location_id && locationName ? ` - ${locationName}` : '';
+
+  return `${item?.item_name ?? '-'}${status !== 'operational' ? ` (${status || 'unknown'})` : ''}${locationSuffix}`;
+};
 </script>
 
 <template>
@@ -108,10 +116,10 @@ const getItemStatus = (item) => {
               :disabled="getItemStatus(item) !== 'operational'"
               :class="getItemStatus(item) !== 'operational' ? 'bg-rose-50 text-rose-700' : ''"
             >
-              {{ item.item_name }}{{ getItemStatus(item) !== 'operational' ? ` (${getItemStatus(item) || 'unknown'})` : '' }}
+              {{ getItemLabel(item) }}
             </option>
           </select>
-          <p class="mt-1 text-xs text-slate-500">Asset non-operational ditandai merah dan tidak dapat dipilih.</p>
+          <p class="mt-1 text-xs text-slate-500">Non-operational assets are marked red and cannot be selected.</p>
           <p v-if="form.errors.item_id" class="mt-1 text-xs text-rose-600">{{ form.errors.item_id }}</p>
         </div>
 
