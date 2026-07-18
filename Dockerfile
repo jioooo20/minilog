@@ -71,10 +71,19 @@ ARG APP_ENV=production
 ENV APP_ENV=${APP_ENV}
 
 # Install Nginx, supervisor, dan runtime PHP extensions
+# -dev packages diperlukan untuk COMPILE extension, tapi runtime .so files
+# disediakan oleh paket tanpa -dev (libpng, libzip, dll). Maka kita install
+# keduanya, lalu hapus hanya -dev setelah selesai.
 RUN apk add --no-cache \
     nginx \
     supervisor \
     curl \
+    libzip \
+    oniguruma \
+    libxml2 \
+    freetype \
+    libjpeg-turbo \
+    libpng \
     libzip-dev \
     oniguruma-dev \
     libxml2-dev \
