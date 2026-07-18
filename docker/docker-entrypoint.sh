@@ -32,5 +32,8 @@ php /var/www/html/artisan view:cache --ansi 2>/dev/null || true
 
 echo "==> Starting Minilog on port 80"
 
+# Buat directory untuk supervisor log
+mkdir -p /var/log/supervisor
+
 # Start supervisord (which manages nginx + php-fpm)
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
