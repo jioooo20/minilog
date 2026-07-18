@@ -1,0 +1,27 @@
+# =============================================================================
+# Docker Compose untuk Minilog (Laravel 12)
+# Akses dari luar via port 8001 → container port 80
+# =============================================================================
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: minilog
+    restart: unless-stopped
+    ports:
+      - "8001:80"
+    environment:
+      APP_ENV: production
+      APP_DEBUG: false
+      APP_URL: "http://your-domain.com"
+      LOG_LEVEL: warning
+      DB_CONNECTION: sqlite
+      # Simpan DB di storage agar persist
+      DB_DATABASE: "/var/www/html/storage/database.sqlite"
+    volumes:
+      # Mount .env dari host (WAJIB dibuat dulu di VPS)
+      - .env:/var/www/html/.env:ro
+      # Persist storage (database, logs, session, cache, uploads)
+      - minilog_storage:/var/www/html/storage

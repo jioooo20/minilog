@@ -6,5 +6,4 @@ docker run -d \
   --name minilog \
   -p 8001:80 \
   -v /path/to/.env:/var/www/html/.env \
-  --restart unless-stoped \
   minilog:latest
