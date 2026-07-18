@@ -38,6 +38,7 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /app
 
 # Copy dependency manifests first (untuk Docker layer caching)
+# --no-scripts karena artisan belum tersedia di tahap ini
 COPY composer.json composer.lock ./
 RUN composer install \
     --no-dev \
@@ -45,10 +46,14 @@ RUN composer install \
     --no-progress \
     --no-suggest \
     --optimize-autoloader \
-    --prefer-dist
+    --prefer-dist \
+    --no-scripts
 
 # Copy seluruh source code
 COPY . .
+
+# Jalankan scripts composer (post-autoload-dump) setelah artisan tersedia
+RUN composer run-script post-autoload-dump
 
 # Build frontend assets (Vite + Vue)
 RUN npm ci --no-audit --no-fund && \
