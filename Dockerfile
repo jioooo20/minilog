@@ -98,6 +98,9 @@ RUN apk add --no-cache \
     opcache \
     && apk del --no-cache libzip-dev oniguruma-dev libxml2-dev freetype-dev libjpeg-turbo-dev libpng-dev
 
+# Hapus default pool config dari base image (biar tidak conflict port 9000)
+RUN rm -f /usr/local/etc/php-fpm.d/www.conf
+
 # Copy PHP configuration
 COPY docker/php.ini /usr/local/etc/php/conf.d/minilog.ini
 COPY docker/php-fpm.conf /usr/local/etc/php-fpm.d/zz-minilog.conf
