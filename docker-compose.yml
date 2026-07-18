@@ -25,3 +25,7 @@ services:
       - .env:/var/www/html/.env:ro
       # Persist storage (database, logs, session, cache, uploads)
       - minilog_storage:/var/www/html/storage
+
+volumes:
+  minilog_storage:
+    driver: local
