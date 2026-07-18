@@ -1,7 +1,7 @@
 # =============================================================================
 # Minilog — Laravel 12 Dockerfile
 # Multi-stage build: PHP + Composer + Node (builder) → PHP-FPM + Nginx (runner)
-# Exposed port: 80
+# Port: 80 internal — akses dari luar via port mapping (misal -p 8001:80)
 # =============================================================================
 
 # ---- Stage 1: Build dependencies & assets ----
@@ -17,25 +17,18 @@ RUN apk add --no-cache \
     libzip-dev \
     oniguruma-dev \
     libxml2-dev \
-    sqlite-dev \
     freetype-dev \
     libjpeg-turbo-dev \
     libpng-dev \
     nodejs \
     npm
 
-# Configure the GD extension to use the image libraries we just installed
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg
-
-# PHP extensions required by Laravel (Removed json and tokenizer)
-RUN docker-php-ext-install -j$(nproc) \
-    pdo \
-    pdo_sqlite \
-    mbstring \
-    xml \
+# PHP extensions yg dibutuhkan oleh Laravel (hanya yg TIDAK built-in)
+# Catatan: pdo, pdo_sqlite, mbstring, xml, ctype, fileinfo, json, tokenizer
+# sudah built-in di php:8.3-cli-alpine dan TIDAK perlu diinstall ulang
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) \
     bcmath \
-    ctype \
-    fileinfo \
     zip \
     gd
 
@@ -44,7 +37,7 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
 
-# Copy dependency manifests first (for Docker layer caching)
+# Copy dependency manifests first (untuk Docker layer caching)
 COPY composer.json composer.lock ./
 RUN composer install \
     --no-dev \
@@ -54,15 +47,15 @@ RUN composer install \
     --optimize-autoloader \
     --prefer-dist
 
-# Copy the rest of the application
+# Copy seluruh source code
 COPY . .
 
-# Build frontend assets
+# Build frontend assets (Vite + Vue)
 RUN npm ci --no-audit --no-fund && \
     npm run build && \
     rm -rf node_modules
 
-# Clean up
+# Bersihkan .env (akan dibuat ulang di runtime)
 RUN rm -rf .env
 
 
@@ -72,7 +65,7 @@ FROM php:8.3-fpm-alpine AS runner
 ARG APP_ENV=production
 ENV APP_ENV=${APP_ENV}
 
-# Install Nginx, supervisor, and runtime PHP extensions
+# Install Nginx, supervisor, dan runtime PHP extensions
 RUN apk add --no-cache \
     nginx \
     supervisor \
@@ -83,16 +76,9 @@ RUN apk add --no-cache \
     freetype-dev \
     libjpeg-turbo-dev \
     libpng-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) \
-    pdo \
-    pdo_sqlite \
-    mbstring \
-    xml \
     bcmath \
-    ctype \
-    fileinfo \
-    json \
-    tokenizer \
     zip \
     gd \
     opcache \
@@ -112,10 +98,10 @@ COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY docker/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 RUN chmod +x /usr/local/bin/docker-entrypoint
 
-# Copy application files from builder stage
+# Copy aplikasi dari builder stage
 COPY --from=builder /app /var/www/html
 
-# Set permissions
+# Set permission untuk storage & cache
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
 WORKDIR /var/www/html
