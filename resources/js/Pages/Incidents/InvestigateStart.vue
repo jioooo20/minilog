@@ -1,5 +1,7 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import AttachmentList from '@/Components/AttachmentList.vue';
+import AttachmentUpload from '@/Components/AttachmentUpload.vue';
 import ModalConfirm from '@/Components/ModalConfirm.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import axios from 'axios';
@@ -55,6 +57,40 @@ const form = reactive({
   investigation_notes: inc.value.investigation_notes ?? '',
   root_cause_hypothesis: inc.value.root_cause_hypothesis ?? '',
 });
+
+// Attachment state
+const showUploader = ref(false);
+const attachmentsList = ref(inc.value.attachments ?? []);
+
+// Group attachments by source
+const createAttachments = computed(() =>
+  attachmentsList.value.filter((a) => a.source === 'create')
+);
+const investigationAttachments = computed(() =>
+  attachmentsList.value.filter((a) => a.source === 'investigation')
+);
+const otherAttachments = computed(() =>
+  attachmentsList.value.filter((a) => a.source !== 'create' && a.source !== 'investigation')
+);
+const repairAttachments = computed(() =>
+  otherAttachments.value.filter((a) => a.source === 'repair')
+);
+const verificationAttachments = computed(() =>
+  otherAttachments.value.filter((a) => a.source === 'verification')
+);
+const closingAttachments = computed(() =>
+  otherAttachments.value.filter((a) => a.source === 'closing')
+);
+
+const onAttachmentUploaded = (newAttachments) => {
+  attachmentsList.value = newAttachments;
+  showUploader.value = false;
+};
+
+const onAttachmentDeleted = () => {
+  // After delete, we reload page to get updated list
+  router.reload({ preserveScroll: true });
+};
 
 const formatDate = (value) => {
   if (!value) return '-';
@@ -127,7 +163,7 @@ const handleConfirm = async () => {
 </script>
 
 <template>
-  <Head :title="`Investigasi ${inc.incident_code || ''}`" />
+  <Head :title="`Investigation ${inc.incident_code || ''}`" />
 
   <AuthenticatedLayout>
     <template #header>
@@ -241,8 +277,133 @@ const handleConfirm = async () => {
       </section>
 
       <aside class="space-y-6">
+        <!-- Create Incident Attachment Card -->
         <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 class="text-base font-semibold text-slate-900">Checklist Investigasi</h2>
+          <div class="flex items-center gap-2">
+            <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-slate-100 text-xs font-semibold text-slate-600">1</span>
+            <h2 class="text-base font-semibold text-slate-900">Create Incident</h2>
+          </div>
+          <p class="mt-1 text-xs text-slate-500">Attachment saat pelaporan awal insiden</p>
+          <div class="mt-3">
+            <AttachmentList
+              v-if="createAttachments.length > 0"
+              :attachments="createAttachments"
+              :incident-id="inc.incident_id"
+              :can-delete="true"
+              @deleted="onAttachmentDeleted"
+            />
+            <div
+              v-else
+              class="rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-center"
+            >
+              <p class="text-xs text-slate-500">Belum ada attachment</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Investigation Attachment Card -->
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div class="flex items-center justify-between gap-3">
+            <div class="flex items-center gap-2">
+              <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-amber-100 text-xs font-semibold text-amber-700">2</span>
+              <h2 class="text-base font-semibold text-slate-900">Investigasi</h2>
+            </div>
+            <button
+              v-if="!showUploader"
+              type="button"
+              class="rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-slate-700"
+              @click="showUploader = true"
+            >
+              + Upload
+            </button>
+          </div>
+          <p class="mt-1 text-xs text-slate-500">Upload Investigation Attachments</p>
+          <div class="mt-3">
+            <div v-if="showUploader" class="mb-3">
+              <AttachmentUpload
+                :incident-id="inc.incident_id"
+                source-group="investigation"
+                @uploaded="onAttachmentUploaded"
+              />
+              <button
+                type="button"
+                class="mt-2 text-xs text-slate-500 hover:text-slate-700"
+                @click="showUploader = false"
+              >
+                Cancel
+              </button>
+            </div>
+            <AttachmentList
+              v-if="investigationAttachments.length > 0"
+              :attachments="investigationAttachments"
+              :incident-id="inc.incident_id"
+              :can-delete="true"
+              @deleted="onAttachmentDeleted"
+            />
+            <div
+              v-else
+              class="rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-center"
+            >
+              <p class="text-xs text-slate-500">Belum ada attachment</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Other Stages Attachment Card (repair, verification, closing) -->
+        <div
+          v-if="otherAttachments.length > 0"
+          class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+        >
+          <div class="flex items-center gap-2">
+            <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-slate-100 text-xs font-semibold text-slate-600">3</span>
+            <h2 class="text-base font-semibold text-slate-900">Tahap Lainnya</h2>
+          </div>
+          <p class="mt-1 text-xs text-slate-500">Attachment dari repair, verification, atau closing</p>
+          <div class="mt-3 space-y-4">
+            <!-- Repair -->
+            <div v-if="repairAttachments.length > 0">
+              <h4 class="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-blue-600">
+                <span class="inline-block h-2 w-2 rounded-full bg-blue-500"></span>
+                Repair
+              </h4>
+              <AttachmentList
+                :attachments="repairAttachments"
+                :incident-id="inc.incident_id"
+                :can-delete="true"
+                @deleted="onAttachmentDeleted"
+              />
+            </div>
+            <!-- Verification -->
+            <div v-if="verificationAttachments.length > 0">
+              <h4 class="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-emerald-600">
+                <span class="inline-block h-2 w-2 rounded-full bg-emerald-500"></span>
+                Verifikasi
+              </h4>
+              <AttachmentList
+                :attachments="verificationAttachments"
+                :incident-id="inc.incident_id"
+                :can-delete="true"
+                @deleted="onAttachmentDeleted"
+              />
+            </div>
+            <!-- Closing -->
+            <div v-if="closingAttachments.length > 0">
+              <h4 class="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-purple-600">
+                <span class="inline-block h-2 w-2 rounded-full bg-purple-500"></span>
+                Closing
+              </h4>
+              <AttachmentList
+                :attachments="closingAttachments"
+                :incident-id="inc.incident_id"
+                :can-delete="true"
+                @deleted="onAttachmentDeleted"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <h2 class="text-base font-semibold text-slate-900">Checklist Investigation</h2>
           <ul class="mt-4 space-y-3 text-sm text-slate-700">
             <li class="rounded-lg bg-slate-50 px-3 py-2">Check machine and sensor logs.</li>
             <li class="rounded-lg bg-slate-50 px-3 py-2">Conduct interviews with operators and field witnesses.</li>

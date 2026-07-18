@@ -1,5 +1,7 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import AttachmentList from '@/Components/AttachmentList.vue';
+import AttachmentUpload from '@/Components/AttachmentUpload.vue';
 import ModalConfirm from '@/Components/ModalConfirm.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import axios from 'axios';
@@ -43,6 +45,19 @@ const form = reactive({
 	corrective_actions: inc.value.corrective_actions ?? '',
 	parts_replaced: inc.value.parts_replaced ?? '',
 });
+
+// Attachment state
+const showUploader = ref(false);
+const attachmentsList = ref(inc.value.attachments ?? []);
+
+const onAttachmentUploaded = (newAttachments) => {
+  attachmentsList.value = newAttachments;
+  showUploader.value = false;
+};
+
+const onAttachmentDeleted = () => {
+  router.reload({ preserveScroll: true });
+};
 
 const formatDate = (value) => {
 	if (!value) return '-';
@@ -227,8 +242,45 @@ const handleConfirm = async () => {
 			</section>
 
 			<aside class="space-y-6">
-				<div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-					<h2 class="text-base font-semibold text-slate-900">Checklist Repair</h2>
+        <!-- Attachment Upload -->
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div class="flex items-center justify-between gap-3">
+            <h2 class="text-base font-semibold text-slate-900">Before/After Photos</h2>
+            <button
+              v-if="!showUploader"
+              type="button"
+              class="rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-slate-700"
+              @click="showUploader = true"
+            >
+              + Upload
+            </button>
+          </div>
+          <div class="mt-3">
+            <div v-if="showUploader" class="mb-3">
+              <AttachmentUpload
+                :incident-id="inc.incident_id"
+                source-group="repair"
+                @uploaded="onAttachmentUploaded"
+              />
+              <button
+                type="button"
+                class="mt-2 text-xs text-slate-500 hover:text-slate-700"
+                @click="showUploader = false"
+              >
+                Cancel
+              </button>
+            </div>
+            <AttachmentList
+              :attachments="attachmentsList"
+              :incident-id="inc.incident_id"
+              :can-delete="true"
+              @deleted="onAttachmentDeleted"
+            />
+          </div>
+        </div>
+
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <h2 class="text-base font-semibold text-slate-900">Checklist Repair</h2>
 					<ul class="mt-4 space-y-3 text-sm text-slate-700">
 						<li class="rounded-lg bg-slate-50 px-3 py-2">Ensure the repair is in line with the approved hypothesis.</li>
 						<li class="rounded-lg bg-slate-50 px-3 py-2">Document the repair actions clearly.</li>

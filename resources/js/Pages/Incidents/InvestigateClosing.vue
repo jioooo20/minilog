@@ -1,5 +1,7 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import AttachmentList from '@/Components/AttachmentList.vue';
+import AttachmentUpload from '@/Components/AttachmentUpload.vue';
 import ModalConfirm from '@/Components/ModalConfirm.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import axios from 'axios';
@@ -57,6 +59,19 @@ const confirmClass = computed(() => {
 
   return 'bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500';
 });
+
+// Attachment state
+const showUploader = ref(false);
+const attachmentsList = ref(inc.value.attachments ?? []);
+
+const onAttachmentUploaded = (newAttachments) => {
+  attachmentsList.value = newAttachments;
+  showUploader.value = false;
+};
+
+const onAttachmentDeleted = () => {
+  router.reload({ preserveScroll: true });
+};
 
 const formatDate = (value) => {
   if (!value) return '-';
@@ -247,6 +262,43 @@ const handleConfirm = async () => {
       />
 
       <aside class="space-y-6">
+        <!-- Attachment Upload -->
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div class="flex items-center justify-between gap-3">
+            <h2 class="text-base font-semibold text-slate-900">Dokumen Pendukung</h2>
+            <button
+              v-if="!showUploader"
+              type="button"
+              class="rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-slate-700"
+              @click="showUploader = true"
+            >
+              + Upload
+            </button>
+          </div>
+          <div class="mt-3">
+            <div v-if="showUploader" class="mb-3">
+              <AttachmentUpload
+                :incident-id="inc.incident_id"
+                source-group="closing"
+                @uploaded="onAttachmentUploaded"
+              />
+              <button
+                type="button"
+                class="mt-2 text-xs text-slate-500 hover:text-slate-700"
+                @click="showUploader = false"
+              >
+                Cancel
+              </button>
+            </div>
+            <AttachmentList
+              :attachments="attachmentsList"
+              :incident-id="inc.incident_id"
+              :can-delete="true"
+              @deleted="onAttachmentDeleted"
+            />
+          </div>
+        </div>
+
         <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <h2 class="text-base font-semibold text-slate-900">Checklist Closing</h2>
           <ul class="mt-4 space-y-3 text-sm text-slate-700">

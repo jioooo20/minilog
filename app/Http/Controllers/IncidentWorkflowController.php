@@ -63,6 +63,7 @@ class IncidentWorkflowController extends Controller
             'location',
             'reporter',
             'handler',
+            'attachments.uploader',
             'auditLogs.user',
         ]);
 
@@ -125,6 +126,7 @@ class IncidentWorkflowController extends Controller
             'reporter',
             'handler',
             'approver',
+            'attachments.uploader',
             'auditLogs.user',
         ]);
 
@@ -254,6 +256,7 @@ class IncidentWorkflowController extends Controller
             'handler',
             'approver',
             'verifier',
+            'attachments.uploader',
             'auditLogs.user',
         ]);
 
@@ -287,6 +290,7 @@ class IncidentWorkflowController extends Controller
             'reporter',
             'handler',
             'verifier',
+            'attachments.uploader',
             'auditLogs.user',
         ]);
 
@@ -320,6 +324,7 @@ class IncidentWorkflowController extends Controller
             'handler',
             'verifier',
             'approver',
+            'attachments.uploader',
             'auditLogs.user',
         ]);
 

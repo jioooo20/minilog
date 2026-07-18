@@ -15,6 +15,7 @@ class AttachmentResource extends JsonResource
             'file_size' => $this->file_size,
             'mime_type' => $this->mime_type,
             'description' => $this->description,
+            'source' => $this->source,
             'uploaded_at' => optional($this->uploaded_at)->toDateTimeString(),
             'uploaded_by' => $this->whenLoaded('uploader', function () {
                 return ['id' => $this->uploader?->id, 'name' => $this->uploader?->name];

@@ -23,6 +23,7 @@ class Attachment extends Model
         'file_size',
         'mime_type',
         'description',
+        'source',
         'uploaded_at',
     ];
 

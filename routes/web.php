@@ -174,6 +174,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('verify', [IncidentWorkflowController::class, 'verifyPage'])->name('incidents.verify-form');
             Route::post('verify', [IncidentWorkflowController::class, 'verify'])->name('incidents.verify');
         });
+
+        // Attachment routes: semua role yang punya akses ke incident
+        Route::middleware('role:operator|engineer|supervisor')->group(function () {
+            Route::post('attachments', [\App\Http\Controllers\AttachmentController::class, 'store'])
+                ->name('incidents.attachments.store');
+            Route::delete('attachments/{attachment}', [\App\Http\Controllers\AttachmentController::class, 'destroy'])
+                ->name('incidents.attachments.destroy');
+            Route::get('attachments/{attachment}/download', [\App\Http\Controllers\AttachmentController::class, 'download'])
+                ->name('incidents.attachments.download');
+        });
     });
 });
 //  *

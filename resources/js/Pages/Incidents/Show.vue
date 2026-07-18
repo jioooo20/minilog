@@ -1,8 +1,10 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import AttachmentList from '@/Components/AttachmentList.vue';
+import AttachmentUpload from '@/Components/AttachmentUpload.vue';
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import axios from 'axios';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 
 const page = usePage();
 const currentUserId = computed(() => page.props.auth?.user?.id ?? null);
@@ -14,6 +16,31 @@ const props = defineProps({
 
 // Ensure inc.value is always an object so template property access won't throw
 const inc = computed(() => props.incident?.data ?? props.incident ?? {});
+
+// Attachment state
+const showUploader = ref(false);
+const attachmentsList = ref(inc.value.attachments ?? []);
+
+const canUpload = computed(() => {
+  return ['operator', 'engineer', 'supervisor'].includes(currentUserRole.value);
+});
+
+const canManageAttachments = computed(() => {
+  // Operator: only own incidents ; Engineer: handled incidents ; Supervisor: all
+  if (currentUserRole.value === 'supervisor') return true;
+  if (currentUserRole.value === 'engineer' && inc.value.assigned_to?.id === currentUserId.value) return true;
+  if (currentUserRole.value === 'operator' && inc.value.reported_by?.id === currentUserId.value) return true;
+  return false;
+});
+
+const onAttachmentUploaded = (newAttachments) => {
+  attachmentsList.value = newAttachments;
+  showUploader.value = false;
+};
+
+const onAttachmentDeleted = (deletedId) => {
+  attachmentsList.value = attachmentsList.value.filter((a) => a.attachment_id !== deletedId);
+};
 
 // Debugging aid: log incoming prop shape so we can confirm what Inertia sends
 /* eslint-disable no-console */
@@ -204,6 +231,48 @@ const canCloseIncident = computed(() => {
         <div class="mt-4">
           <div class="text-xs text-slate-500">Description</div>
           <div class="mt-2 whitespace-pre-line text-sm text-slate-700">{{ inc.description || '-' }}</div>
+        </div>
+      </section>
+
+      <!-- Attachments Section -->
+      <section class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div class="flex items-center justify-between gap-3">
+          <h2 class="text-sm font-semibold text-slate-800">Attachments ({{ attachmentsList.length || 0 }})</h2>
+          <button
+            v-if="canUpload && canManageAttachments && !showUploader"
+            type="button"
+            class="rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-slate-700"
+            @click="showUploader = true"
+          >
+            + Add Attachment
+          </button>
+        </div>
+
+        <div class="mt-3">
+          <!-- Upload form (collapsible) -->
+          <div v-if="showUploader && canManageAttachments" class="mb-4">
+            <AttachmentUpload
+              :incident-id="inc.incident_id"
+              source-group="create"
+              @uploaded="onAttachmentUploaded"
+            />
+            <button
+              v-if="showUploader"
+              type="button"
+              class="mt-2 text-xs text-slate-500 hover:text-slate-700"
+              @click="showUploader = false"
+            >
+              Cancel upload
+            </button>
+          </div>
+
+          <!-- Attachment list -->
+          <AttachmentList
+            :attachments="attachmentsList"
+            :incident-id="inc.incident_id"
+            :can-delete="canManageAttachments"
+            @deleted="onAttachmentDeleted"
+          />
         </div>
       </section>
 
