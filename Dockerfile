@@ -17,13 +17,17 @@ RUN apk add --no-cache \
     libzip-dev \
     oniguruma-dev \
     libxml2-dev \
+    sqlite-dev \
     freetype-dev \
     libjpeg-turbo-dev \
     libpng-dev \
     nodejs \
     npm
 
-# PHP extensions required by Laravel
+# Configure the GD extension to use the image libraries we just installed
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg
+
+# PHP extensions required by Laravel (Removed json and tokenizer)
 RUN docker-php-ext-install -j$(nproc) \
     pdo \
     pdo_sqlite \
@@ -32,8 +36,6 @@ RUN docker-php-ext-install -j$(nproc) \
     bcmath \
     ctype \
     fileinfo \
-    json \
-    tokenizer \
     zip \
     gd
 
