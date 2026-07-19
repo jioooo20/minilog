@@ -21,6 +21,8 @@ mkdir -p /var/www/html/storage/framework/sessions
 mkdir -p /var/www/html/storage/framework/views
 mkdir -p /var/www/html/storage/logs
 chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+chown -R www-data:www-data /var/www/html/storage
+chmod -R 775 /var/www/html/storage
 
 # Run migrations (if DB is ready)
 php /var/www/html/artisan migrate --force 2>/dev/null || echo "==> Migration skipped (DB not ready yet)"
