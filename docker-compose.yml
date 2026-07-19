@@ -22,7 +22,7 @@ services:
       DB_DATABASE: "/var/www/html/storage/database.sqlite"
     volumes:
       # Mount .env dari host (WAJIB dibuat dulu di VPS)
-      - .env:/var/www/html/.env:ro
+      - .env:/var/www/html/.env
       # Persist storage (database, logs, session, cache, uploads)
       - minilog_storage:/var/www/html/storage
 
